@@ -1,73 +1,88 @@
 import java.util.*;
 
-// Reservation Class
-class Reservation {
+// Custom Exception Class
+class InvalidBookingException extends Exception {
 
-    private String reservationId;
-
-    public Reservation(String reservationId) {
-        this.reservationId = reservationId;
-    }
-
-    public String getReservationId() {
-        return reservationId;
+    public InvalidBookingException(String message) {
+        super(message);
     }
 }
 
-// BookingHistory Class
-class BookingHistory {
+// RoomInventory Class
+class RoomInventory {
 
-    // List to store confirmed reservations
-    private List<Reservation> confirmedReservations;
+    private Map<String, Integer> rooms;
 
-    // Constructor
-    public BookingHistory() {
-        confirmedReservations = new ArrayList<>();
+    public RoomInventory() {
+        rooms = new HashMap<>();
+        rooms.put("Single", 2);
+        rooms.put("Double", 2);
+        rooms.put("Suite", 1);
     }
 
-    // Add reservation to history
-    public void addReservation(Reservation reservation) {
-        confirmedReservations.add(reservation);
-    }
-
-    // Get all reservations
-    public List<Reservation> getConfirmedReservations() {
-        return confirmedReservations;
+    public int getAvailability(String roomType) {
+        return rooms.getOrDefault(roomType, 0);
     }
 }
 
-// BookingReportService Class
-class BookingReportService {
+// ReservationValidator Class
+class ReservationValidator {
 
-    // Generate report
-    public void generateReport(BookingHistory history) {
+    public void validate(String guestName, String roomType, RoomInventory inventory)
+            throws InvalidBookingException {
 
-        System.out.println("Booking History and Reporting");
-
-        List<Reservation> reservations = history.getConfirmedReservations();
-
-        for (Reservation r : reservations) {
-            System.out.println("Reservation ID: " + r.getReservationId());
+        // Validate guest name
+        if (guestName == null || guestName.trim().isEmpty()) {
+            throw new InvalidBookingException("Guest name cannot be empty.");
         }
 
-        System.out.println("Total Bookings: " + reservations.size());
+        // Validate room type (CASE SENSITIVE ⚠)
+        if (!(roomType.equals("Single") ||
+                roomType.equals("Double") ||
+                roomType.equals("Suite"))) {
+            throw new InvalidBookingException("Invalid room type selected.");
+        }
+
+        // Validate availability
+        if (inventory.getAvailability(roomType) <= 0) {
+            throw new InvalidBookingException("No rooms available for selected type.");
+        }
     }
 }
 
 // Main Class
-public class UseCase8BookingHistoryReport {
+public class bookmystayapp {
 
     public static void main(String[] args) {
 
-        BookingHistory history = new BookingHistory();
+        System.out.println("Booking Validation");
 
-        // Add confirmed reservations
-        history.addReservation(new Reservation("Single-1"));
-        history.addReservation(new Reservation("Double-2"));
-        history.addReservation(new Reservation("Suite-3"));
+        Scanner scanner = new Scanner(System.in);
 
-        // Generate report
-        BookingReportService reportService = new BookingReportService();
-        reportService.generateReport(history);
+        RoomInventory inventory = new RoomInventory();
+        ReservationValidator validator = new ReservationValidator();
+
+        try {
+            // Input
+            System.out.print("Enter guest name: ");
+            String guestName = scanner.nextLine();
+
+            System.out.print("Enter room type (Single/Double/Suite): ");
+            String roomType = scanner.nextLine();
+
+            // Validation
+            validator.validate(guestName, roomType, inventory);
+
+            // If valid
+            System.out.println("Booking successful!");
+
+        } catch (InvalidBookingException e) {
+
+            // Handle error
+            System.out.println("Booking failed: " + e.getMessage());
+
+        } finally {
+            scanner.close();
+        }
     }
-}}
+}
