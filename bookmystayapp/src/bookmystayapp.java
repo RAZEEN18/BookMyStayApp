@@ -17,20 +17,16 @@ class Reservation {
 // BookingHistory Class
 class BookingHistory {
 
-    // List to store confirmed reservations
     private List<Reservation> confirmedReservations;
 
-    // Constructor
     public BookingHistory() {
         confirmedReservations = new ArrayList<>();
     }
 
-    // Add reservation to history
     public void addReservation(Reservation reservation) {
         confirmedReservations.add(reservation);
     }
 
-    // Get all reservations
     public List<Reservation> getConfirmedReservations() {
         return confirmedReservations;
     }
@@ -39,7 +35,6 @@ class BookingHistory {
 // BookingReportService Class
 class BookingReportService {
 
-    // Generate report
     public void generateReport(BookingHistory history) {
 
         System.out.println("Booking History and Reporting");
@@ -70,4 +65,4 @@ public class UseCase8BookingHistoryReport {
         BookingReportService reportService = new BookingReportService();
         reportService.generateReport(history);
     }
-}}
+}
