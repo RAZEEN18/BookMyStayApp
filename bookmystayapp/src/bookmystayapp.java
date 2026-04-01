@@ -1,68 +1,92 @@
 import java.util.*;
 
-// Reservation Class
-class Reservation {
+// RoomInventory class
+class RoomInventory {
+    private Map<String, Integer> rooms;
 
-    private String reservationId;
-
-    public Reservation(String reservationId) {
-        this.reservationId = reservationId;
+    public RoomInventory() {
+        rooms = new HashMap<>();
+        rooms.put("Single", 2);
+        rooms.put("Double", 2);
+        rooms.put("Suite", 1);
     }
 
-    public String getReservationId() {
-        return reservationId;
-    }
-}
-
-// BookingHistory Class
-class BookingHistory {
-
-    private List<Reservation> confirmedReservations;
-
-    public BookingHistory() {
-        confirmedReservations = new ArrayList<>();
+    public void incrementRoom(String roomType) {
+        rooms.put(roomType, rooms.getOrDefault(roomType, 0) + 1);
     }
 
-    public void addReservation(Reservation reservation) {
-        confirmedReservations.add(reservation);
-    }
-
-    public List<Reservation> getConfirmedReservations() {
-        return confirmedReservations;
+    public void displayInventory() {
+        System.out.println("Current Inventory:");
+        for (String type : rooms.keySet()) {
+            System.out.println(type + " : " + rooms.get(type));
+        }
     }
 }
 
-// BookingReportService Class
-class BookingReportService {
+// Cancellation Service
+class CancellationService {
 
-    public void generateReport(BookingHistory history) {
+    private Stack<String> releasedRooms;
+    private Map<String, String> reservationMap;
 
-        System.out.println("Booking History and Reporting");
+    public CancellationService() {
+        releasedRooms = new Stack<>();
+        reservationMap = new HashMap<>();
+    }
 
-        List<Reservation> reservations = history.getConfirmedReservations();
+    // Register booking
+    public void registerBooking(String reservationId, String roomType) {
+        reservationMap.put(reservationId, roomType);
+        System.out.println("Booking confirmed: " + reservationId + " -> " + roomType);
+    }
 
-        for (Reservation r : reservations) {
-            System.out.println("Reservation ID: " + r.getReservationId());
+    // Cancel booking
+    public void cancelBooking(String reservationId, RoomInventory inventory) {
+
+        if (!reservationMap.containsKey(reservationId)) {
+            System.out.println("Invalid cancellation! Reservation not found.");
+            return;
         }
 
-        System.out.println("Total Bookings: " + reservations.size());
+        String roomType = reservationMap.get(reservationId);
+
+        releasedRooms.push(roomType);
+        inventory.incrementRoom(roomType);
+        reservationMap.remove(reservationId);
+
+        System.out.println("Booking cancelled: " + reservationId);
+    }
+
+    // Show rollback history
+    public void showRollbackHistory() {
+        System.out.println("Rollback History (Recent first):");
+        for (int i = releasedRooms.size() - 1; i >= 0; i--) {
+            System.out.println(releasedRooms.get(i));
+        }
     }
 }
 
-// Main Class
-public class UseCase8BookingHistoryReport {
+// Main class
+public class UseCase10BookingCancellation {
 
     public static void main(String[] args) {
 
-        BookingHistory history = new BookingHistory();
+        RoomInventory inventory = new RoomInventory();
+        CancellationService service = new CancellationService();
 
-        // Add confirmed reservations
-        history.addReservation(new Reservation("Single-1"));
-        history.addReservation(new Reservation("Double-2"));
-        history.addReservation(new Reservation("Suite-3"));
+        service.registerBooking("R101", "Single");
+        service.registerBooking("R102", "Double");
 
-        // Generate report
-        BookingReportService reportService = new BookingReportService();
-        reportService.generateReport(history);
+        System.out.println();
+
+        service.cancelBooking("R101", inventory);
+
+        System.out.println();
+
+        inventory.displayInventory();
+
+        System.out.println();
+
+        service.showRollbackHistory();
     }
 }
