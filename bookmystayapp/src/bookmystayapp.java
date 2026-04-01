@@ -1,6 +1,6 @@
 import java.util.*;
 
-// RoomInventory class to manage room counts
+// RoomInventory class
 class RoomInventory {
     private Map<String, Integer> rooms;
 
@@ -26,10 +26,7 @@ class RoomInventory {
 // Cancellation Service
 class CancellationService {
 
-    // Stack for rollback (LIFO)
     private Stack<String> releasedRooms;
-
-    // Map for reservation tracking
     private Map<String, String> reservationMap;
 
     public CancellationService() {
@@ -46,22 +43,15 @@ class CancellationService {
     // Cancel booking
     public void cancelBooking(String reservationId, RoomInventory inventory) {
 
-        // Validation
         if (!reservationMap.containsKey(reservationId)) {
             System.out.println("Invalid cancellation! Reservation not found.");
             return;
         }
 
-        // Get room type
         String roomType = reservationMap.get(reservationId);
 
-        // Push into stack (rollback tracking)
         releasedRooms.push(roomType);
-
-        // Restore inventory
         inventory.incrementRoom(roomType);
-
-        // Remove booking
         reservationMap.remove(reservationId);
 
         System.out.println("Booking cancelled: " + reservationId);
@@ -77,30 +67,26 @@ class CancellationService {
 }
 
 // Main class
-public class bookmystayapp {
+public class UseCase10BookingCancellation {
 
     public static void main(String[] args) {
 
         RoomInventory inventory = new RoomInventory();
         CancellationService service = new CancellationService();
 
-        // Register bookings
         service.registerBooking("R101", "Single");
         service.registerBooking("R102", "Double");
 
         System.out.println();
 
-        // Cancel booking
         service.cancelBooking("R101", inventory);
 
         System.out.println();
 
-        // Show inventory after rollback
         inventory.displayInventory();
 
         System.out.println();
 
-        // Show rollback history
         service.showRollbackHistory();
     }
 }
