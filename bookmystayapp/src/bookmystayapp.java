@@ -57,9 +57,9 @@ class PersistenceService {
 
     private static final String FILE_NAME = "data.ser";
 
-    // SAVE
     public static void save(BookingSystem system) {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+        try (ObjectOutputStream out =
+                     new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
             out.writeObject(system);
             System.out.println("Data saved successfully.");
         } catch (IOException e) {
@@ -67,20 +67,20 @@ class PersistenceService {
         }
     }
 
-    // LOAD
     public static BookingSystem load() {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+        try (ObjectInputStream in =
+                     new ObjectInputStream(new FileInputStream(FILE_NAME))) {
             System.out.println("Data loaded successfully.");
             return (BookingSystem) in.readObject();
         } catch (Exception e) {
             System.out.println("No previous data found. Starting fresh.");
-            return new BookingSystem(); // recovery fallback
+            return new BookingSystem();
         }
     }
 }
 
 // Main Class
-public class bookmystayapp {
+public class UseCase12DataPersistenceRecovery {
 
     public static void main(String[] args) {
 
@@ -94,7 +94,7 @@ public class bookmystayapp {
         System.out.println();
         system.show();
 
-        // Save state before exit
+        // Save before exit
         PersistenceService.save(system);
     }
 }
